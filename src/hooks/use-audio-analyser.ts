@@ -11,7 +11,7 @@ export function useAudioAnalyser(
   isPlaying: boolean,
   onSongEnd: () => void
 ) {
-  const [data, setData] = useState<Uint8Array | null>(null);
+  const [data, setData] = useState<Float32Array | null>(null);
   const analyserRef = useRef<Tone.Analyser | null>(null);
   const playerRef = useRef<Tone.Player | null>(null);
   const micRef = useRef<Tone.UserMedia | null>(null);
@@ -26,7 +26,7 @@ export function useAudioAnalyser(
         console.log('Audio context started.');
       }
       if (!analyserRef.current) {
-        analyserRef.current = new Tone.Analyser('waveform', 256);
+        analyserRef.current = new Tone.Analyser('fft', 1024);
       }
     } catch (e) {
       console.error("Could not start audio context", e);
@@ -126,7 +126,7 @@ export function useAudioAnalyser(
     const analyse = () => {
       if (analyserRef.current && isPlaying) {
         const value = analyserRef.current.getValue();
-        if (value instanceof Uint8Array) {
+        if (value instanceof Float32Array) {
           setData(value);
         }
       }
@@ -139,7 +139,7 @@ export function useAudioAnalyser(
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
-      setData(new Uint8Array(256).fill(128));
+      setData(new Float32Array(1024).fill(-Infinity));
     }
 
     return () => {

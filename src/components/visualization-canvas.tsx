@@ -173,10 +173,28 @@ export function VisualizationCanvas({
 
   useEffect(() => {
     if (audioData && materialRef.current) {
-      if (!audioTextureRef.current) {
-        audioTextureRef.current = new THREE.DataTexture(audioData, audioData.length / 4, 1, THREE.RGBAFormat);
+      // audioData is a Float32Array of dB values.
+      // We need to normalize it to a 0-1 range for the shader.
+      const normalizedData = new Float32Array(audioData.length);
+      for (let i = 0; i < audioData.length; i++) {
+        // Map dB range [-100, -20] to [0, 1].
+        const db = audioData[i];
+        if (db === -Infinity) {
+          normalizedData[i] = 0;
+          continue;
+        }
+        const normalized = Math.max(0, Math.min(1, (db + 100) / 80));
+        normalizedData[i] = normalized;
+      }
+
+      if (!audioTextureRef.current || audioTextureRef.current.image.width !== normalizedData.length) {
+        if (audioTextureRef.current) {
+            audioTextureRef.current.dispose();
+        }
+        audioTextureRef.current = new THREE.DataTexture(normalizedData, normalizedData.length, 1, THREE.RedFormat, THREE.FloatType);
+        audioTextureRef.current.needsUpdate = true;
       } else {
-        audioTextureRef.current.image.data = audioData;
+        audioTextureRef.current.image.data = normalizedData;
         audioTextureRef.current.needsUpdate = true;
       }
       materialRef.current.uniforms.iAudio.value = audioTextureRef.current;
