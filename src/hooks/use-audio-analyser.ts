@@ -26,7 +26,7 @@ export function useAudioAnalyser(
         console.log('Audio context started.');
       }
       if (!analyserRef.current) {
-        analyserRef.current = new Tone.Analyser('fft', 256);
+        analyserRef.current = new Tone.Analyser('waveform', 256);
       }
     } catch (e) {
       console.error("Could not start audio context", e);
@@ -139,7 +139,7 @@ export function useAudioAnalyser(
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
-      setData(new Uint8Array(256).fill(0));
+      setData(new Uint8Array(256).fill(128));
     }
 
     return () => {
