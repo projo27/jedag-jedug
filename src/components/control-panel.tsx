@@ -27,14 +27,14 @@ import { Github, Music, SlidersHorizontal, Video, Wand2 } from 'lucide-react';
 interface ControlPanelProps {
   onShaderGenerated: (shaderCode: string, description: string) => void;
   onParamChange: (newParams: Partial<VisualizationParameters>) => void;
-  onAudioSourceChange: (source: 'mic' | 'file') => void;
+  onAudioSourceChange: (source: 'mic' | 'file' | 'system') => void;
   onFileChange: (file: File | null) => void;
   onPlayToggle: (playing: boolean) => void;
   onRecordToggle: (recording: boolean) => void;
   params: VisualizationParameters;
   shaderCode: string;
   shaderDescription: string;
-  audioSource: 'mic' | 'file';
+  audioSource: 'mic' | 'file' | 'system';
   isPlaying: boolean;
   isRecording: boolean;
 }
@@ -81,7 +81,7 @@ export function ControlPanel({
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 space-y-4">
-              <RadioGroup value={audioSource} onValueChange={(value: 'mic' | 'file') => onAudioSourceChange(value)}>
+              <RadioGroup value={audioSource} onValueChange={(value: 'mic' | 'file' | 'system') => onAudioSourceChange(value)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="mic" id="mic" />
                   <Label htmlFor="mic">Microphone</Label>
@@ -89,6 +89,10 @@ export function ControlPanel({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="file" id="file" />
                   <Label htmlFor="file">Audio File</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="system" id="system" />
+                  <Label htmlFor="system">System Audio</Label>
                 </div>
               </RadioGroup>
               {audioSource === 'mic' && (
@@ -98,6 +102,11 @@ export function ControlPanel({
               )}
               {audioSource === 'file' && (
                 <Input type="file" accept="audio/mp3, audio/wav, audio/ogg" onChange={handleFileSelect} />
+              )}
+              {audioSource === 'system' && (
+                <Button onClick={() => onPlayToggle(!isPlaying)} className="w-full">
+                  {isPlaying ? 'Stop Capturing' : 'Start Capturing'}
+                </Button>
               )}
             </AccordionContent>
           </AccordionItem>
