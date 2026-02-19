@@ -15,7 +15,8 @@ const GenerateShaderFromPromptInputSchema = z.object({
   mood: z
     .string()
     .describe(
-      'The desired mood for the shader (e.g., calm, energetic, mysterious).'n    ),
+      'The desired mood for the shader (e.g., calm, energetic, mysterious).'
+    ),
   style: z
     .string()
     .describe('The desired visual style (e.g., abstract, geometric, organic).'),
@@ -67,12 +68,12 @@ The shader code should be complete and runnable. Focus on creating a visually ap
 Provide the raw GLSL fragment shader code as a string, along with a brief description of what the shader visualizes and how it achieves the desired mood/style/complexity.
 
 Example Output:
-```json
+\`\`\`json
 {
   "shaderCode": "// GLSL code goes here\nvoid main() {\n  gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);\n}",
   "description": "A simple magenta shader demonstrating basic output."
 }
-```
+\`\`\`
 
 Remember to create a unique and complex shader based on the given parameters, and include necessary uniforms like 'iTime' for animation.
 `,
