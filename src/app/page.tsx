@@ -6,12 +6,12 @@ import { ControlPanel } from "@/components/control-panel";
 import { VisualizationCanvas } from "@/components/visualization-canvas";
 import type { VisualizationParameters } from "@/types";
 
-const defaultShader = `// Default shader: "Cosmic Pulse"
-// by AI
+const defaultShader = `// Default shader: "Cosmic Pulse" - Beat Reactive
+// by AI & Studio
 precision highp float;
 uniform vec2 iResolution;
 uniform float iTime;
-uniform sampler2D iAudio;
+uniform sampler2D iAudio; // Frequency data (FFT)
 uniform vec3 u_color1;
 uniform vec3 u_color2;
 uniform float u_speed;
@@ -27,7 +27,18 @@ void main() {
     vec2 uv0 = uv;
     vec3 finalColor = vec3(0.0);
     
-    float audio = texture2D(iAudio, vec2(length(uv0) * 0.2, 0.25)).r * u_intensity;
+    // --- Beat Detection ---
+    // Average the low frequencies (bass/kick drums) for a "beat" value.
+    // The iAudio texture contains FFT data, with low frequencies at the start.
+    float beat = 0.0;
+    for (int i = 0; i < 16; i++) {
+        // Sample the first 16 frequency bins.
+        beat += texture2D(iAudio, vec2(float(i) / 1024.0, 0.5)).r;
+    }
+    beat /= 16.0;
+    
+    // Amplify the effect for more impact.
+    float audio = beat * u_intensity * 2.0;
 
     for (float i = 0.0; i < 4.0; i++) {
         uv = fract(uv * (1.5 + audio * 0.5)) - 0.5;

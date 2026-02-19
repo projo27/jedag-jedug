@@ -36,7 +36,11 @@ export function VisualizationCanvas({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
 
-  const audioData = useAudioAnalyser(audioSource, audioFileUrl, isPlaying, () => onPlayToggle(false));
+  const handleAudioEnd = useCallback(() => {
+    onPlayToggle(false);
+  }, [onPlayToggle]);
+
+  const audioData = useAudioAnalyser(audioSource, audioFileUrl, isPlaying, handleAudioEnd);
 
   const [showControls, setShowControls] = useState(true);
 
