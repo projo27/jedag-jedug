@@ -11,7 +11,7 @@ import { Button } from './ui/button';
 interface VisualizationCanvasProps {
   shaderCode: string;
   params: VisualizationParameters;
-  audioSource: 'mic' | 'file';
+  audioSource: 'mic' | 'file' | 'system';
   audioFileUrl?: string;
   isPlaying: boolean;
   onPlayToggle: (playing: boolean) => void;

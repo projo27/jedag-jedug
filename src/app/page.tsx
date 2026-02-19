@@ -57,7 +57,7 @@ export default function Home() {
     speed: 0.5,
     intensity: 1.0,
   });
-  const [audioSource, setAudioSource] = useState<'mic' | 'file'>('mic');
+  const [audioSource, setAudioSource] = useState<'mic' | 'file' | 'system'>('mic');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -73,7 +73,7 @@ export default function Home() {
     setParams(prev => ({ ...prev, ...newParams }));
   }, []);
 
-  const handleAudioSourceChange = useCallback((source: 'mic' | 'file') => {
+  const handleAudioSourceChange = useCallback((source: 'mic' | 'file' | 'system') => {
     setAudioSource(source);
     setIsPlaying(false);
     setAudioFile(null);

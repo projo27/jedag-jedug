@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import * as Tone from 'tone';
 
-type AudioSourceType = 'mic' | 'file';
+type AudioSourceType = 'mic' | 'file' | 'system';
 
 export function useAudioAnalyser(
   sourceType: AudioSourceType,
@@ -15,6 +15,8 @@ export function useAudioAnalyser(
   const analyserRef = useRef<Tone.Analyser | null>(null);
   const playerRef = useRef<Tone.Player | null>(null);
   const micRef = useRef<Tone.UserMedia | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const streamSourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const animationFrameIdRef = useRef<number>();
 
   const setupAudio = useCallback(async () => {
@@ -37,6 +39,15 @@ export function useAudioAnalyser(
     micRef.current = null;
     playerRef.current?.stop();
     playerRef.current?.disconnect();
+
+    if (streamSourceNodeRef.current) {
+      streamSourceNodeRef.current.disconnect();
+      streamSourceNodeRef.current = null;
+    }
+    if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
@@ -78,6 +89,30 @@ export function useAudioAnalyser(
           }
           if (playerRef.current && playerRef.current.state !== 'started') {
             playerRef.current.start();
+          }
+        } else if (sourceType === 'system') {
+          try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+            streamRef.current = stream;
+
+            const videoTrack = stream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.onended = () => {
+                    onSongEnd();
+                };
+            }
+
+            if (stream.getAudioTracks().length > 0) {
+                const audioContext = Tone.context;
+                streamSourceNodeRef.current = audioContext.createMediaStreamSource(stream);
+                streamSourceNodeRef.current.connect(analyserRef.current);
+            } else {
+                console.warn("Selected media has no audio track.");
+                onSongEnd();
+            }
+          } catch(e) {
+              console.error("System audio capture failed or was cancelled.", e);
+              onSongEnd();
           }
         }
       }
